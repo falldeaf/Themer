@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THEMER</title>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white">
+
+<div x-data="settingsApp()" class="flex justify-center items-center min-h-screen">
+
+	<!-- logo above the settings box, same width as the settings box -->
+	<div class="w-full max-w-4xl text-center mb-6 absolute z-10" style="top: 104px;">
+		<img src="themerlogo.png" alt="Workflow" class="mx-auto">
+	</div>
+
+	<div class="w-full max-w-4xl bg-gray-800 p-6 rounded-lg shadow-lg relative z-20 bg-opacity-80 backdrop-blur-lg">
+
+	<h1 class="text-3xl font-bold mb-6 text-center">⚙️ Profile Settings</h1>
+
+	<!-- Section for Settings Profiles -->
+	<div class="space-y-4">
+		<template x-for="(profile, profileName) in settings" :key="profileName">
+		<div class="bg-gray-700 p-4 rounded-lg shadow-md flex items-center justify-between">
+			<!-- Profile Info -->
+			<div>
+			<h2 class="text-xl font-semibold" x-text="profileName"></h2>
+			<p class="text-sm text-gray-400"><strong>Cron:</strong> <span x-text="profile.cron"></span></p>
+			<div class="mt-2 flex items-center">
+				<label class="mr-2">Active:</label>
+				<input type="checkbox" :checked="profile.active" class="toggle-checkbox" @change="toggleActive(profileName)">
+			</div>
+			<!-- Latest Generation Date -->
+			<div class="mt-2 text-sm text-gray-400" x-show="latest[profileName] && latest[profileName].date">
+				<strong>Last Generated:</strong>
+				<span x-text="new Date(latest[profileName].date).toLocaleString()"></span>
+			</div>
+			</div>
+
+			<!-- Actions Section -->
+			<div class="flex space-x-4">
+			<template x-for="action in profile.actions" :key="action.name">
+				<div class="bg-gray-600 p-3 rounded-lg text-center relative flex items-center space-x-2">
+				<div>
+					<p class="text-sm font-semibold" x-text="action.name"></p>
+					<p class="text-xs" x-text="action.resolution"></p>
+				</div>
+				<!-- Link Icon -->
+				<div>
+					<template x-if="latest[profileName] && latest[profileName][action.name]">
+					<a
+						:href="latest[profileName][action.name].url"
+						target="_blank"
+						:title="latest[profileName].description"
+						class="link-icon text-blue-400 hover:text-blue-600"
+					>🔗</a>
+					</template>
+					<template x-if="!latest[profileName] || !latest[profileName][action.name]">
+					<span class="link-icon-ghost text-gray-500 cursor-not-allowed" title="No latest data available">🔗</span>
+					</template>
+				</div>
+				<!-- Action Toggle -->
+				<div class="ml-2">
+					<input type="checkbox" :checked="action.active" class="toggle-checkbox" @change="toggleAction(profileName, action.name)">
+				</div>
+				</div>
+			</template>
+			</div>
+		</div>
+		</template>
+	</div>
+
+	</div>
+</div>
+
+<script>
+	function settingsApp() {
+	return {
+		settings: {},
+		latest: {},
+
+		fetchData() {
+		// Fetch settings
+		fetch('/settings')
+			.then(response => response.json())
+			.then(data => {
+			this.settings = data;
+			});
+
+		// Fetch latest runs
+		fetch('/latest')
+			.then(response => response.json())
+			.then(data => {
+			this.latest = data;
+			});
+		},
+
+		toggleActive(profileName) {
+		// Simple function to toggle profile active status
+		this.settings[profileName].active = !this.settings[profileName].active;
+		},
+
+		toggleAction(profileName, actionName) {
+		// Simple function to toggle action active status
+		const action = this.settings[profileName].actions.find(a => a.name === actionName);
+		if (action) {
+			action.active = !action.active;
+		}
+		},
+
+		init() {
+		// Initial data fetch
+		this.fetchData();
+
+		// Polling every 5 seconds for real-time updates
+		setInterval(() => {
+			this.fetchData();
+		}, 5000);
+		}
+	}
+	}
+</script>
+
+<!-- Optional toggle styling -->
+<style>
+	.link-icon {
+	font-size: 1.5rem;
+	}
+
+	.link-icon-ghost {
+	font-size: 1.5rem;
+	opacity: 0.2;
+	}
+
+	.toggle-checkbox {
+	appearance: none;
+	width: 36px;
+	height: 20px;
+	background: #4b5563;
+	border-radius: 10px;
+	position: relative;
+	cursor: pointer;
+	outline: none;
+	transition: background 0.2s ease;
+	}
+
+	.toggle-checkbox:checked {
+	background: #34D399;
+	}
+
+	.toggle-checkbox:before {
+	content: "";
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 16px;
+	height: 16px;
+	background: white;
+	border-radius: 50%;
+	transition: transform 0.2s ease;
+	}
+
+	.toggle-checkbox:checked:before {
+	transform: translateX(16px);
+	}
+</style>
+</body>
+</html>

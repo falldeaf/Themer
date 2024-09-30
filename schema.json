@@ -1,0 +1,82 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"type": "object",
+	"properties": {
+	"cron": {
+		"type": "string",
+		"pattern": "^(((\\*|([0-5]?\\d))\\s+){4}(\\*|([0-5]?\\d)))$",
+		"description": "A valid cron string for scheduling. Should follow the pattern: minute hour day month day-of-week."
+	},
+	"active": {
+		"type": "boolean",
+		"description": "Flag to indicate if the profile is active."
+	},
+	"name": {
+		"type": "string",
+		"description": "The name of the profile."
+	},
+	"savegenerated": {
+		"type": "boolean",
+		"description": "Flag to save generated images."
+	},
+	"darkmode": {
+		"type": "boolean",
+		"description": "Flag for dark mode usage."
+	},
+	"plugin": {
+		"type": "string",
+		"description": "The name of the plugin used."
+	},
+	"inputstring": {
+		"type": "string",
+		"description": "The template for generating an image."
+	},
+	"enums": {
+		"type": "object",
+		"patternProperties": {
+		"^[a-zA-Z0-9_]+$": {
+			"type": "object",
+			"properties": {
+			"options": {
+				"type": "array",
+				"items": {
+				"type": "string"
+				},
+				"description": "A list of search and replace values for randomized variables."
+			},
+			"random": {
+				"type": "string",
+				"enum": ["incremental", "random", "perceived", "shuffle"],
+				"description": "The randomization method for this enum."
+			}
+			},
+			"required": ["options", "random"]
+		}
+		},
+		"description": "A dynamic list of enums that provide randomized variables for replacement in the input string."
+	},
+	"actions": {
+		"type": "array",
+		"items": {
+		"type": "object",
+		"properties": {
+			"name": {
+			"type": "string",
+			"description": "The name of the action."
+			},
+			"resolution": {
+			"type": "string",
+			"description": "Resolution for the action (e.g., 16:9, 4:3)."
+			},
+			"active": {
+			"type": "boolean",
+			"description": "Flag to indicate if the action is active."
+			}
+		},
+		"required": ["name", "resolution", "active"]
+		},
+		"description": "List of actions associated with this profile."
+	}
+	},
+	"required": ["cron", "active", "name", "plugin", "inputstring", "enums", "actions"]
+}

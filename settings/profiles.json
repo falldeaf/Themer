@@ -1,0 +1,43 @@
+{
+	"default": {
+		"cron": "*/5 * * * *",
+		"active": true,
+		"name": "default",
+		"savegenerated": true,
+		"darkmode": true,
+		"plugin": "ideogram",
+		"inputstring": "An image of a {{subject}} in the style of {{style}} with highlights of {{color}} on a {{darkmode}} background",
+		"enums": {
+			"style": {
+				"options": [
+					"classic", "modern", "abstract"
+				],
+				"random": "perceived"
+			},
+			"color": {
+				"options": [
+					"red", "green", "blue", "yellow", "purple", "orange", "pink", "black", "white"
+				],
+				"random": "incremental"
+			},
+			"subject": {
+				"options": [
+					"landscape", "cat", "dog", "bird", "flower", "tree", "mountain", "city", "sunset", "ocean"
+				],
+				"random": "shuffle"
+			}
+		},
+		"actions": [
+			{
+				"name": "desktop",
+				"resolution": "16:9",
+				"active": true
+			},
+			{
+				"name": "mobile",
+				"resolution": "9:16",
+				"active": true
+			}
+		]
+	}
+}
